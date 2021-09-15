@@ -115,6 +115,8 @@ int main(int argc, char **argv)
 
 	// initialization of write mutex
 	pthread_mutex_init(&m_write, NULL);
+
+	// initialization and lock the finish program mutex
 	pthread_mutex_init(&m_somebodydied, NULL);
 	pthread_mutex_lock(&m_somebodydied);
 
