@@ -6,12 +6,14 @@
 
 pthread_mutex_t	m_write;
 pthread_mutex_t	*m_forks;
-pthread_mutex_t	*m_someboy_died;
-int				no_philo;//number of philosophers and forks
+pthread_mutex_t	m_somebodydied;
+int				no_philo[5];			//number of philosophers and forks
+uint64_t		startTime;
+uint64_t		*lastTimeEat;
 
 uint64_t getTime()
 {
-	struct timeval tv;
+	static struct timeval tv;
 
 	gettimeofday(&tv, NULL);
 	return ((tv.tv_sec * (uint64_t)1000) + (tv.tv_usec / 1000));
@@ -20,56 +22,92 @@ uint64_t getTime()
 void message(int nu, char *msg)
 {
 	pthread_mutex_lock(&m_write);
-	printf("[%llu]\tphilo %d %s\n", getTime(), nu, msg);
+	printf("[%llu]\tPhilosopher %d %s\n", getTime() - startTime, nu, msg);
 	pthread_mutex_unlock(&m_write);
+}
+
+void *amidie(void *arg)
+{
+	int i = 0;
+	int nu = *((int *) arg);
+	while (1)
+	{
+		if (getTime() > lastTimeEat[nu] + (uint64_t)no_philo[1])
+		{
+			message(nu + 1, "died");
+			pthread_mutex_unlock(&m_somebodydied);
+			i = 0;
+			while (i < no_philo[0])
+			{
+				pthread_mutex_destroy(&m_forks[i]);
+				i++;
+			}
+			pthread_mutex_destroy(&m_write);
+			pthread_mutex_destroy(&m_somebodydied);
+			exit(1);
+		}
+	}
 }
 
 void *routine(void *arg)
 {
-	int i = 0;
+	pthread_t philo;
 	int nu = *((int *) arg);
-	while (i < 5)
+	lastTimeEat[nu] = getTime();
+	pthread_create(&philo, NULL, amidie, (void *)&nu);
+	pthread_detach(philo);
+	while (5)
 	{
-		i++;
+		// locking forks mutex
 		pthread_mutex_lock(&m_forks[nu]);
-		message(nu, "take a fork");
-		pthread_mutex_lock(&m_forks[(nu + i) % no_philo]);
-		message(nu, "take a fork");
-		message(nu, "is eating...");
-		usleep(100);
-		message(nu, "has finished eating");
+		message(nu + 1, "take a fork");
+		pthread_mutex_lock(&m_forks[(nu + 1) % no_philo[0]]);
+		message(nu + 1, "take a fork");
+
+		// eating
+		lastTimeEat[nu] = getTime();
+		message(nu + 1, "is eating");
+		usleep(no_philo[2] * 1000);
+
+		// sleeping
 		pthread_mutex_unlock(&m_forks[nu]);
-		pthread_mutex_unlock(&m_forks[(nu + i) % no_philo]);
-		message(nu, "is sleeping...");
-		usleep(100);
-		message(nu, "is thinking");
-		usleep(100);
+		pthread_mutex_unlock(&m_forks[(nu + 1) % no_philo[0]]);
+		message(nu + 1, "is sleeping");
+		usleep(no_philo[3] * 1000);
+		message(nu + 1, "is thinking");
 	}
-	return (NULL);
 }
 
 int main(int argc, char **argv)
 {
-	pthread_t	*philo;
+	pthread_t	philo;
 	int			i;
 
 	i = 0;
 	(void)argc;
 
 	// taking and converting the arguments
-	no_philo = atoi(argv[1]);
+	while (i < 4)
+	{
+		no_philo[i] = atoi(argv[i + 1]);
+		i++;
+	}
+	if (argv[i + 1])
+		no_philo[i] = atoi(argv[i + 1]);
+	else
+		no_philo[i] = 0;
+
+	// birthTime and lastTimeEat allocation
+	lastTimeEat = malloc(sizeof(uint64_t) * no_philo[0]);
 
 	// mallocing the thread and the mutex
-	philo = malloc(sizeof(pthread_t) * no_philo);
-	m_forks = malloc(sizeof(pthread_mutex_t) * no_philo);
-	if (!philo)
-		return (1);
+	m_forks = malloc(sizeof(pthread_mutex_t) * no_philo[0]);
 	if (!m_forks)
 		return (1);
 
 	// initialization of forks(mutex)
 	i = 0;
-	while (i < no_philo)
+	while (i < no_philo[0])
 	{
 		pthread_mutex_init(&m_forks[i], NULL);
 		i++;
@@ -77,28 +115,19 @@ int main(int argc, char **argv)
 
 	// initialization of write mutex
 	pthread_mutex_init(&m_write, NULL);
-	// pthread_mutex_init(&m_somebody_died, NULL);
+	pthread_mutex_init(&m_somebodydied, NULL);
+	pthread_mutex_lock(&m_somebodydied);
 
+	startTime = getTime();
 	// creation of philosophers threads
-	i = 1;
-	while (i <= no_philo)
+	i = 0;
+	while (i < no_philo[0])
 	{
-		pthread_create(&philo[i], NULL, routine, (void *)&i);
-		pthread_detach(philo[i]);
+		pthread_create(&philo, NULL, routine, (void *)&i);
+		pthread_detach(philo);
 		usleep(100);
 		i++;
 	}
-
-	// closing the program
-	
-	sleep(5);
-	i = 0;
-	while (i < no_philo)
-	{
-		pthread_mutex_destroy(&m_forks[i]);
-		i++;
-	}
-	pthread_mutex_destroy(&m_write);
-	free(philo);
+	while (1){}
 	return (0);
 }
