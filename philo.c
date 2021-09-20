@@ -121,18 +121,6 @@ int main(int argc, char **argv)
 		pthread_mutex_destroy(&table.m_forks[i]);
 		i++;
 	}
-	exit(0);
-/*
-	i = 0;
-	while (i < table.no_philo[0])
-	{
-		printf("freeing lastTimeEat[%d] = %llu in progress...\n", i, table.lastTimeEat[i]);
-		free(&table.lastTimeEat[i]);
-		printf("%d freed successfully\n", i);
-		i++;
-	}
-	free(table.lastTimeEat);
-	printf("lastTimeEat freed\n");
-*/
+
 	return (0);
 }
