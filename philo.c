@@ -2,13 +2,14 @@
 
 void *amidie(void *arg)
 {
-	int nu = *((int *) arg);
+	t_life *table=((t_life *) arg);
+	int nu = table->nu;
 	while (1)
 	{
-		if (getTime() > table.lastTimeEat[nu] + (uint64_t)table.no_philo[1])
+		if (getTime() > table->lastTimeEat[nu] + (uint64_t)table->no_philo[1])
 		{
-			message(nu + 1, "died");
-			pthread_mutex_unlock(&table.m_somebodydied);
+			message(nu + 1, "died", table);
+			pthread_mutex_unlock(&table->m_somebodydied);
 			break ;
 		}
 	}
@@ -17,30 +18,31 @@ void *amidie(void *arg)
 
 void *routine(void *arg)
 {
+	t_life *table=((t_life *) arg);
 	pthread_t philo;
-	int nu = *((int *) arg);
-	table.lastTimeEat[nu] = getTime();
-	pthread_create(&philo, NULL, amidie, (void *)&nu);
+	int nu = table->nu;
+	table->lastTimeEat[nu] = getTime();
+	pthread_create(&philo, NULL, amidie, arg);
 	pthread_detach(philo);
 	while (5)
 	{
 		// locking forks mutex
-		pthread_mutex_lock(&table.m_forks[nu]);
-		message(nu + 1, "take a fork");
-		pthread_mutex_lock(&table.m_forks[(nu + 1) % table.no_philo[0]]);
-		message(nu + 1, "take a fork");
+		pthread_mutex_lock(&table->m_forks[nu]);
+		message(nu + 1, "take a fork", table);
+		pthread_mutex_lock(&table->m_forks[(nu + 1) % table->no_philo[0]]);
+		message(nu + 1, "take a fork", table);
 
 		// eating
-		table.lastTimeEat[nu] = getTime();
-		message(nu + 1, "is eating");
-		usleep(table.no_philo[2] * 1000);
+		table->lastTimeEat[nu] = getTime();
+		message(nu + 1, "is eating", table);
+		usleep(table->no_philo[2] * 1000);
 
 		// sleeping
-		pthread_mutex_unlock(&table.m_forks[nu]);
-		pthread_mutex_unlock(&table.m_forks[(nu + 1) % table.no_philo[0]]);
-		message(nu + 1, "is sleeping");
-		usleep(table.no_philo[3] * 1000);
-		message(nu + 1, "is thinking");
+		pthread_mutex_unlock(&table->m_forks[nu]);
+		pthread_mutex_unlock(&table->m_forks[(nu + 1) % table->no_philo[0]]);
+		message(nu + 1, "is sleeping", table);
+		usleep(table->no_philo[3] * 1000);
+		message(nu + 1, "is thinking", table);
 	}
 }
 
@@ -48,23 +50,30 @@ int main(int argc, char **argv)
 {
 	pthread_t	philo;
 	int			i;
+	t_life		table;
 
 	i = 0;
-	(void)argc;
+
+	// check the number of argument
+	if (argc < 6 || argc > 7)
+	{
+		printf("Error: wrong argument number\n");
+		return (1);
+	}
 
 	// taking and converting the arguments
-	while (i < 4)
+	while (i < 5)
 	{
 		table.no_philo[i] = atoi(argv[i + 1]);
 		i++;
 	}
-	if (argv[i + 1])
+	if (argc == 7)
 		table.no_philo[i] = atoi(argv[i + 1]);
 	else
 		table.no_philo[i] = 0;
 
 	// lastTimeEat allocation
-	table.lastTimeEat = malloc(sizeof(uint64_t) * table.no_philo[0]);
+	table.lastTimeEat = (uint64_t *)malloc(sizeof(uint64_t) * table.no_philo[0]);
 
 	// allocate and initializate the forks mutex (same number of the philo)
 	table.m_forks = malloc(sizeof(pthread_mutex_t) * table.no_philo[0]);
@@ -92,7 +101,8 @@ int main(int argc, char **argv)
 	i = 0;
 	while (i < table.no_philo[0])
 	{
-		pthread_create(&philo, NULL, routine, (void *)&i);
+		table.nu = i;
+		pthread_create(&philo, NULL, routine, (void *)&table);
 		pthread_detach(philo);
 		usleep(100);
 		i++;
@@ -111,6 +121,18 @@ int main(int argc, char **argv)
 		pthread_mutex_destroy(&table.m_forks[i]);
 		i++;
 	}
-
+	exit(0);
+/*
+	i = 0;
+	while (i < table.no_philo[0])
+	{
+		printf("freeing lastTimeEat[%d] = %llu in progress...\n", i, table.lastTimeEat[i]);
+		free(&table.lastTimeEat[i]);
+		printf("%d freed successfully\n", i);
+		i++;
+	}
+	free(table.lastTimeEat);
+	printf("lastTimeEat freed\n");
+*/
 	return (0);
 }
