@@ -14,3 +14,13 @@ void message(int nu, char *msg, t_life *table)
 	printf("[%llu]\tPhilosopher %d %s\n", getTime() - table->startTime, nu, msg);
 	pthread_mutex_unlock(&table->m_write);
 }
+
+void	ft_usleep(int time)
+{
+	unsigned long	end;
+
+	end = getTime() + time;
+	while (getTime() < end)
+		usleep(time);
+}
+

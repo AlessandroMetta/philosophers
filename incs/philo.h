@@ -13,7 +13,10 @@ typedef struct s_life
 	int				nu;
 	uint64_t		startTime;
 	uint64_t		*lastTimeEat;
+	int				check;
 }				t_life;
 
 uint64_t getTime();
 void message(int nu, char *msg, t_life *table);
+void	ft_usleep(int time);
+
