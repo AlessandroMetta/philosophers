@@ -1,28 +1,26 @@
 #include "../incs/philo.h"
 
-int init(t_life *table, int argc, char **argv)
+int init(t_args *table, int argc, char **argv)
 {
 	int i;
 
 	i = 0;
-	while (i < 4)
-	{
-		table->no_philo[i] = atoi(argv[i + 1]);
-		i++;
-	}
+	table->num_of_philo = (uint64_t)atoi(argv[1]);
+	table->time_to_die = (uint64_t)atoi(argv[2]);
+	table->time_to_eat = (uint64_t)atoi(argv[3]);
+	table->time_to_sleep = (uint64_t)atoi(argv[4]);
 	if (argc == 6)
-		table->no_philo[i] = atoi(argv[i + 1]);
+		table->meal_ammount = atoi(argv[5]);
 	else
-		table->no_philo[i] = 0;
+		table->meal_ammount = 0;
 	pthread_mutex_init(&table->m_write, NULL);
 	pthread_mutex_init(&table->m_somebodydied, NULL);
 	pthread_mutex_lock(&table->m_somebodydied);
-	table->startTime = getTime();
-	table->m_forks = malloc(sizeof(pthread_mutex_t) * table->no_philo[0]);
+	table->start_time = get_time();
+	table->m_forks = malloc(sizeof(pthread_mutex_t) * table->num_of_philo);
 	if (!table->m_forks)
 		return (1);
-	i = 0;
-	while (i < table->no_philo[0])
+	while (i < (int)table->num_of_philo)
 	{
 		pthread_mutex_init(&table->m_forks[i], NULL);
 		i++;
@@ -30,26 +28,26 @@ int init(t_life *table, int argc, char **argv)
 	return(0);
 }
 
-void take_fork(t_life *table, int nu)
+void take_fork(t_args *table, int nu)
 {
 	pthread_mutex_lock(&table->m_forks[nu]);
 	message(nu + 1, "has taken a fork", table);
-	pthread_mutex_lock(&table->m_forks[(nu + 1) % table->no_philo[0]]);
+	pthread_mutex_lock(&table->m_forks[(nu + 1) % table->num_of_philo]);
 	message(nu + 1, "has taken a fork", table);
 }
 
-void eat(t_person *ph, int nu)
+void eat(t_philo *ph, int nu)
 {
-	ph->lastMeal = getTime();
+	ph->last_meal = get_time();
 	message(nu + 1, "is eating", ph->table);
-	ft_usleep(ph->table->no_philo[2]);
+	ft_usleep(ph->table->time_to_eat);
 }
 
-void go_to_bed(t_life *table, int nu)
+void go_to_bed(t_args *table, int nu)
 {	
 	pthread_mutex_unlock(&table->m_forks[nu]);
-	pthread_mutex_unlock(&table->m_forks[(nu + 1) % table->no_philo[0]]);
+	pthread_mutex_unlock(&table->m_forks[(nu + 1) % table->num_of_philo]);
 	message(nu + 1, "is sleeping", table);
-	ft_usleep(table->no_philo[3]);
+	ft_usleep(table->time_to_sleep);
 	message(nu + 1, "is thinking", table);
 }

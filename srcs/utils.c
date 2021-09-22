@@ -1,6 +1,6 @@
 #include "../incs/philo.h"
 
-uint64_t getTime()
+uint64_t get_time()
 {
 	static struct timeval tv;
 
@@ -8,18 +8,19 @@ uint64_t getTime()
 	return ((tv.tv_sec * (uint64_t)1000) + (tv.tv_usec / 1000));
 }
 
-void message(int nu, char *msg, t_life *table)
+void message(int nu, char *msg, t_args *table)
 {
 	pthread_mutex_lock(&table->m_write);
-	printf("[%llu]\tPhilosopher %d %s\n", getTime() - table->startTime, nu, msg);
+	printf("[%llu]\tPhilosopher %d %s\n", get_time() - table->start_time, nu, msg);
 	pthread_mutex_unlock(&table->m_write);
 }
 
-void	ft_usleep(int time)
+void	ft_usleep(uint64_t time_in_ms)
 {
-	unsigned long	end;
+	uint64_t	start_time;
 
-	end = getTime() + time;
-	while (getTime() < end)
-		usleep(time);
+	start_time = 0;
+	start_time = get_time();
+	while ((get_time() - start_time) < time_in_ms)
+		usleep(time_in_ms / 10);
 }
