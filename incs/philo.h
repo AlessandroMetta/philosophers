@@ -13,22 +13,18 @@ typedef struct s_life
 	int				nu;
 	uint64_t		startTime;
 	uint64_t		*lastTimeEat;
-	int				check;
 }				t_life;
 
 typedef struct s_person
 {
 	int			index;
-	uint64_t	lastTimeEat;
+	uint64_t	lastMeal;
 	t_life		*table;
-	pthread_t	philo;
 }				t_person;
-
 uint64_t getTime();
 void message(int nu, char *msg, t_life *table);
 void	ft_usleep(int time);
 int init(t_life *table, int argc, char **argv);
 void take_fork(t_life *table, int nu);
-void eat(t_life *table, int nu);
+void eat(t_person *ph, int nu);
 void go_to_bed(t_life *table, int nu);
-

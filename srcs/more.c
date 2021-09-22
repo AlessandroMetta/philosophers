@@ -33,16 +33,16 @@ int init(t_life *table, int argc, char **argv)
 void take_fork(t_life *table, int nu)
 {
 	pthread_mutex_lock(&table->m_forks[nu]);
-	message(nu + 1, "take a fork", table);
+	message(nu + 1, "has taken a fork", table);
 	pthread_mutex_lock(&table->m_forks[(nu + 1) % table->no_philo[0]]);
-	message(nu + 1, "take a fork", table);
+	message(nu + 1, "has taken a fork", table);
 }
 
-void eat(t_life *table, int nu)
+void eat(t_person *ph, int nu)
 {
-	table->lastTimeEat[nu] = getTime();
-	message(nu + 1, "is eating", table);
-	ft_usleep(table->no_philo[2]);
+	ph->lastMeal = getTime();
+	message(nu + 1, "is eating", ph->table);
+	ft_usleep(ph->table->no_philo[2]);
 }
 
 void go_to_bed(t_life *table, int nu)

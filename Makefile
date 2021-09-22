@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g
+CFLAGS = -Wall -Wextra -Werror
 RM = rm -f
 
 PTHEAD_FLAG = -pthread
@@ -9,7 +9,7 @@ NAME = philo
 SRCS_DIR = srcs/
 SRCS_FILE =	philo.c \
 			utils.c	\
-			more.c	\
+			more.c  \
 
 SRCS = $(addprefix $(SRCS_DIR), $(SRCS_FILE))
 OBJS = $(SRCS:%.c=%.o)

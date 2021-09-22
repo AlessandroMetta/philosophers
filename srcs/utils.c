@@ -23,4 +23,3 @@ void	ft_usleep(int time)
 	while (getTime() < end)
 		usleep(time);
 }
-
