@@ -28,26 +28,53 @@ int init(t_args *table, int argc, char **argv)
 	return(0);
 }
 
-void take_fork(t_args *table, int nu)
+void take_fork(t_philo *ph)
 {
-	pthread_mutex_lock(&table->m_forks[nu]);
-	message(nu + 1, "has taken a fork", table);
-	pthread_mutex_lock(&table->m_forks[(nu + 1) % table->num_of_philo]);
-	message(nu + 1, "has taken a fork", table);
+	pthread_mutex_lock(&ph->table->m_die_checker);
+	if (!ph->table->finish)
+	{
+		pthread_mutex_lock(&ph->table->m_forks[ph->id]);
+		message(ph->id + 1, "has taken a fork", ph->table);
+		pthread_mutex_unlock(&ph->table->m_forks[ph->id]);
+	}
+	pthread_mutex_unlock(&ph->table->m_die_checker);
+	pthread_mutex_lock(&ph->table->m_die_checker);
+	if (!ph->table->finish)
+	{
+		pthread_mutex_lock(&ph->table->m_forks[(ph->id + 1) % ph->table->num_of_philo]);
+		message(ph->id + 1, "has taken a fork", ph->table);
+		pthread_mutex_unlock(&ph->table->m_forks[(ph->id + 1) % ph->table->num_of_philo]);
+	}
+	pthread_mutex_unlock(&ph->table->m_die_checker);
 }
 
-void eat(t_philo *ph, int nu)
+void eat(t_philo *ph)
 {
-	ph->last_meal = get_time();
-	message(nu + 1, "is eating", ph->table);
-	ft_usleep(ph->table->time_to_eat);
+	pthread_mutex_lock(&ph->table->m_die_checker);
+	if (!ph->table->finish)
+	{
+		ph->last_meal = get_time();
+		message(ph->id + 1, "is eating", ph->table);
+		ft_usleep(ph->table->time_to_eat);
+	}
+	pthread_mutex_unlock(&ph->table->m_die_checker);
 }
 
-void go_to_bed(t_args *table, int nu)
-{	
-	pthread_mutex_unlock(&table->m_forks[nu]);
-	pthread_mutex_unlock(&table->m_forks[(nu + 1) % table->num_of_philo]);
-	message(nu + 1, "is sleeping", table);
-	ft_usleep(table->time_to_sleep);
-	message(nu + 1, "is thinking", table);
+void go_to_bed(t_philo *ph)
+{
+	pthread_mutex_lock(&ph->table->m_die_checker);
+	if (!ph->table->finish)
+	{
+		message(ph->id + 1, "is sleeping", ph->table);
+	}
+	pthread_mutex_unlock(&ph->table->m_die_checker);
+	pthread_mutex_unlock(&ph->table->m_forks[ph->id]);
+	pthread_mutex_unlock(&ph->table->m_forks[(ph->id + 1) % ph->table->num_of_philo]);
+	ft_usleep(ph->table->time_to_sleep);
+	pthread_mutex_lock(&ph->table->m_die_checker);
+	if (!ph->table->finish)
+	{
+		message(ph->id + 1, "is thinking", ph->table);
+	}
+	pthread_mutex_unlock(&ph->table->m_die_checker);
 }
