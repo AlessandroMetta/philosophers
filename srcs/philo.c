@@ -40,23 +40,41 @@ void *routine(void *arg)
 	return (NULL);
 }
 
+int	checking_args_validity(char **argv, int argc)
+{
+	if (argc < 5 || argc > 6)
+	{
+		printf("Error: wrong argument number\n");
+		return (1);
+	}
+	while (argc--)
+	{
+		if (argv[argc][0] == '-' && ft_is_number(argv[argc]))
+		{
+			printf("Error: wrong argument number\n");
+			return(1)
+		}
+	}
+	return (0);
+}
+
 int main(int argc, char **argv)
 {
-	int			i;
 	t_args		table;
+	
+	// checking if is possible to start
+	if (checking_args_validity(argv, argc))
+		return (1);
+	init(&table, argc, argv);
+
+	int			i;
 	t_philo		**ph;
 	pthread_t	philo;
 
 	i = 0;
 	// check the number of argument
 	// MISSING THE CHECKING
-	if (argc < 5 || argc > 6)
-	{
-		printf("Error: wrong argument number\n");
-		return (1);
-	}
 
-	init(&table, argc, argv);
 	// taking and converting the arguments
 	ph = (t_philo **)malloc(sizeof(t_philo *) * table.num_of_philo);
 	if (!ph)

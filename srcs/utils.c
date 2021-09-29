@@ -8,11 +8,13 @@ uint64_t get_time()
 	return ((tv.tv_sec * (uint64_t)1000) + (tv.tv_usec / 1000));
 }
 
-void message(int nu, char *msg, t_args *table)
+void	message(args_t *table, uint64_t philo_number, char *msg)
 {
-	pthread_mutex_lock(&table->m_write);
-	printf("[%llu]\tPhilosopher %d %s\n", get_time() - table->start_time, nu, msg);
-	pthread_mutex_unlock(&table->m_write);
+	pthread_mutex_lock(&table->mutex_write);
+	printf("[%llu]\tPhilosopher %llu %s\n", get_time() - table->start_time,
+			philo_number + 1, msg);
+	if (msg[0] != 'd')
+		pthread_mutex_unlock(&table->mutex_write);
 }
 
 void	ft_usleep(uint64_t time_in_ms)
