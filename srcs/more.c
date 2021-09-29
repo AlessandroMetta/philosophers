@@ -14,8 +14,6 @@ int init(t_args *table, int argc, char **argv)
 	else
 		table->meal_ammount = 0;
 	pthread_mutex_init(&table->m_write, NULL);
-	pthread_mutex_init(&table->m_somebodydied, NULL);
-	pthread_mutex_lock(&table->m_somebodydied);
 	table->start_time = get_time();
 	table->m_forks = malloc(sizeof(pthread_mutex_t) * table->num_of_philo);
 	if (!table->m_forks)
@@ -30,51 +28,17 @@ int init(t_args *table, int argc, char **argv)
 
 void take_fork(t_philo *ph)
 {
-	pthread_mutex_lock(&ph->table->m_die_checker);
-	if (!ph->table->finish)
-	{
-		pthread_mutex_lock(&ph->table->m_forks[ph->id]);
-		message(ph->id + 1, "has taken a fork", ph->table);
-		pthread_mutex_unlock(&ph->table->m_forks[ph->id]);
-	}
-	pthread_mutex_unlock(&ph->table->m_die_checker);
-	pthread_mutex_lock(&ph->table->m_die_checker);
-	if (!ph->table->finish)
-	{
-		pthread_mutex_lock(&ph->table->m_forks[(ph->id + 1) % ph->table->num_of_philo]);
-		message(ph->id + 1, "has taken a fork", ph->table);
-		pthread_mutex_unlock(&ph->table->m_forks[(ph->id + 1) % ph->table->num_of_philo]);
-	}
-	pthread_mutex_unlock(&ph->table->m_die_checker);
-}
 
-void eat(t_philo *ph)
-{
-	pthread_mutex_lock(&ph->table->m_die_checker);
-	if (!ph->table->finish)
-	{
-		ph->last_meal = get_time();
-		message(ph->id + 1, "is eating", ph->table);
-		ft_usleep(ph->table->time_to_eat);
-	}
-	pthread_mutex_unlock(&ph->table->m_die_checker);
-}
-
-void go_to_bed(t_philo *ph)
-{
-	pthread_mutex_lock(&ph->table->m_die_checker);
-	if (!ph->table->finish)
-	{
-		message(ph->id + 1, "is sleeping", ph->table);
-	}
-	pthread_mutex_unlock(&ph->table->m_die_checker);
-	pthread_mutex_unlock(&ph->table->m_forks[ph->id]);
-	pthread_mutex_unlock(&ph->table->m_forks[(ph->id + 1) % ph->table->num_of_philo]);
-	ft_usleep(ph->table->time_to_sleep);
-	pthread_mutex_lock(&ph->table->m_die_checker);
-	if (!ph->table->finish)
-	{
-		message(ph->id + 1, "is thinking", ph->table);
-	}
-	pthread_mutex_unlock(&ph->table->m_die_checker);
+	pthread_mutex_lock(&ph->table->m_forks[ph->id]);
+	message(ph->id + 1, "has taken the right fork", ph->table);
+	pthread_mutex_lock(&ph->table->m_forks[(ph->id + 1) % ph->table->num_of_philo]);
+	message(ph->id + 1, "has taken the left fork", ph->table);
+	pthread_mutex_lock(&ph->m_eating);
+	ph->last_meal = get_time();
+	ph->iseating = 1;
+	message(ph->id + 1, "is eating", ph->table);
+	ft_usleep(ph->table->time_to_eat);
+	ph->iseating = 0;
+	ph->meal_counter++;
+	pthread_mutex_unlock(&ph->m_eating);
 }
