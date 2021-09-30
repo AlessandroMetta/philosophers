@@ -29,15 +29,16 @@ typedef struct args_s
 	pthread_mutex_t	mutex_write;
 	pthread_mutex_t	*mutex_forks;
 	uint64_t		finish;
-	philo_t			**philo_th;
+	philo_t			**philo;
 }				args_t;
 
 uint64_t	get_time();
 void		message(args_t *table, uint64_t philo_number, char *msg);
 void		ft_usleep(uint64_t time_in_ms);
-int			init(args_t *table, int argc, char **argv);
+args_t 		*init(int argc, char **argv);
 void		take_fork(philo_t *ph);
 void		eat(philo_t *ph);
 void		go_to_bed(philo_t *ph);
-int			ft_is_number(char *string);
+int			ft_str_is_number(char *string);
 int			ft_atoi(const char *str);
+int			checking_args_validity(char **argv, int argc);

@@ -1,22 +1,45 @@
 #include "../incs/philo.h"
 
+void checking_meal(philo_t	*ph)
+{
+	uint64_t i;
+
+	pthread_mutex_lock(&ph->mutex_eating);
+	i = 0;
+	while (i < ph->table->philo_ammount)
+	{
+		if (ph->table->philo[i]->meal_counter >= ph->table->meal_ammount)
+		{
+			if (i == ph->table->philo_ammount - 1)
+			{
+				pthread_mutex_lock(&ph->table->mutex_write);
+				ph->table->finish = 0;
+			}
+			i++;
+		}
+		else
+			break ;
+	}
+	pthread_mutex_unlock(&ph->mutex_eating);
+}
+
 void *monitor(void *arg)
 {
-	t_philo	*ph = ((t_philo *)arg);	
+	philo_t	*ph;
+
+	ph = ((philo_t *)arg);
 	while (ph->table->finish)
 	{
-		if (!ph->iseating &&
-			get_time() - ph->last_meal >= ph->table->time_to_die)
+		if (!ph->is_eating &&
+			get_time() - ph->last_meal_time >= ph->table->time_to_die)
 		{
-			pthread_mutex_lock(&ph->m_eating);
+			pthread_mutex_lock(&ph->mutex_eating);
 			ph->table->finish = 0;
-			pthread_mutex_lock(&ph->table->m_write);
-			printf("[%llu]\tPhilo %llu died\n", get_time() - ph->table->start_time, ph->id + 1);
-			printf("---------qui dovrebbe uscire-----------\n");
-			pthread_mutex_unlock(&ph->table->m_write);
-			// message(ph->id + 1, "died", ph->table);
-			pthread_mutex_unlock(&ph->m_eating);
+			message(ph->table, ph->philo_number, "died");
+			pthread_mutex_unlock(&ph->mutex_eating);
 		}
+		if (ph->table->meal_ammount && ph->meal_counter >= ph->table->meal_ammount)
+			checking_meal(ph);
 		usleep(100);
 	}
 	return (NULL);
@@ -24,96 +47,58 @@ void *monitor(void *arg)
 
 void *routine(void *arg)
 {
-	t_philo	*ph = ((t_philo *)arg);	
-	// if (ph->id % 2 == 0)
-	// 	ft_usleep(ph->table->time_to_eat);
+	philo_t	*ph;
+
+	ph = ((philo_t *)arg);
 	while (ph->table->finish)
 	{
 		take_fork(ph);
-		message(ph->id + 1, "is sleeping", ph->table);
-		pthread_mutex_unlock(&ph->table->m_forks[ph->id]);
-		pthread_mutex_unlock(&ph->table->m_forks[(ph->id + 1) % ph->table->num_of_philo]);
+		pthread_mutex_unlock(&ph->table->mutex_forks[ph->philo_left_fork]);
+		// message(ph->table, ph->philo_number, "has left the left fork");
+		pthread_mutex_unlock(&ph->table->mutex_forks[ph->philo_right_fork]);
+		// message(ph->table, ph->philo_number, "has left the right fork");
+		message(ph->table, ph->philo_number, "is sleeping");
 		ft_usleep(ph->table->time_to_sleep);
-		message(ph->id + 1, "is thinking", ph->table);
-		usleep(100);
+		message(ph->table, ph->philo_number, "is thinking");
 	}
 	return (NULL);
 }
 
-int	checking_args_validity(char **argv, int argc)
+void	start_philo(args_t		*table)
 {
-	if (argc < 5 || argc > 6)
+	uint64_t	i;
+
+	i = 0;
+	while (i < table->philo_ammount)
 	{
-		printf("Error: wrong argument number\n");
-		return (1);
+		table->philo[i]->last_meal_time = get_time();
+		pthread_create(&table->philo[i]->philo_thread, NULL, routine,
+						(void *)table->philo[i]);
+		i++;
+		usleep(100);
 	}
-	while (argc--)
+
+	i = 0;
+	while (i < table->philo_ammount)
 	{
-		if (argv[argc][0] == '-' && ft_is_number(argv[argc]))
-		{
-			printf("Error: wrong argument number\n");
-			return(1)
-		}
+		pthread_create(&table->philo[i]->monitor_thread, NULL, monitor,
+						(void *)table->philo[i]);
+		i++;
+		usleep(100);
 	}
-	return (0);
 }
 
 int main(int argc, char **argv)
 {
-	t_args		table;
+	args_t		*table;
 	
-	// checking if is possible to start
 	if (checking_args_validity(argv, argc))
 		return (1);
-	init(&table, argc, argv);
-
-	int			i;
-	t_philo		**ph;
-	pthread_t	philo;
-
-	i = 0;
-	// check the number of argument
-	// MISSING THE CHECKING
-
-	// taking and converting the arguments
-	ph = (t_philo **)malloc(sizeof(t_philo *) * table.num_of_philo);
-	if (!ph)
-		return (1);
-
-
-	table.finish = 1;
-
-	// start the cronometer
-	table.start_time = get_time();
-
-	// creation of philosophers threads
-	i = 0;
-	while (i < (int)table.num_of_philo)
-	{
-		ph[i] = (t_philo *)malloc(sizeof(t_philo) * 1);
-		if (!ph[i])
-			return (0);
-		ph[i]->id = i;
-		ph[i]->last_meal = 0;
-		ph[i]->table = &table;
-		ph[i]->iseating = 0;
-		ph[i]->meal_counter = 0;
-		ph[i]->last_meal = get_time();
-		pthread_mutex_init(&ph[i]->m_eating, NULL);
-		pthread_create(&ph[i]->philo, NULL, routine, (void *)ph[i]);
-		i++;
-		usleep(100);
-	}
-
-	i = 0;
-	while (i < (int)table.num_of_philo)
-	{
-		pthread_create(&philo, NULL, monitor, (void *)ph[i]);
-		i++;
-		usleep(100);
-	}
-	while (table.finish)
+	table = init(argc, argv);
+	table->finish = 1;
+	table->start_time = get_time();
+	start_philo(table);
+	while (table->finish)
 		continue ;
-	printf("---------exiting-----------\n");
 	return (0);
 }
