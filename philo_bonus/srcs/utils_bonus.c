@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils_bonus.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/10/01 19:08:07 by ametta            #+#    #+#             */
+/*   Updated: 2021/10/01 19:08:07 by ametta           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../incs/philo_bonus.h"
 
 uint64_t	get_time(void)
@@ -10,11 +22,11 @@ uint64_t	get_time(void)
 
 void	message(t_args *table, uint64_t philo_number, char *msg)
 {
-	pthread_mutex_lock(&table->mutex_write);
+	sem_wait(table->sem_write);
 	printf("[%llu]\tPhilosopher %llu %s\n", get_time() - table->start_time,
 		philo_number + 1, msg);
 	if (msg[0] != 'd')
-		pthread_mutex_unlock(&table->mutex_write);
+		sem_post(table->sem_write);
 }
 
 void	ft_usleep(uint64_t time_in_ms)

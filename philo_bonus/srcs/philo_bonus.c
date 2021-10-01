@@ -1,46 +1,31 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_bonus.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/10/01 19:07:54 by ametta            #+#    #+#             */
+/*   Updated: 2021/10/01 19:12:25 by ametta           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../incs/philo_bonus.h"
-
-void	checking_meal(t_philo	*ph)
-{
-	uint64_t	i;
-
-	i = 0;
-	pthread_mutex_lock(&ph->mutex_eating);
-	while (i < ph->table->philo_ammount)
-	{
-		if (ph->table->philo[i]->meal_counter >= ph->table->meal_ammount)
-		{
-			if (i == ph->table->philo_ammount - 1)
-			{
-				pthread_mutex_lock(&ph->table->mutex_write);
-				ph->table->finish = 0;
-			}
-			i++;
-		}
-		else
-			break ;
-	}
-	pthread_mutex_unlock(&ph->mutex_eating);
-}
 
 void	*monitor(void *arg)
 {
 	t_philo	*ph;
 
 	ph = ((t_philo *)arg);
-	while (ph->table->finish)
+	while (1)
 	{
-		if (!ph->is_eating
-			&& get_time() - ph->last_meal_time >= ph->table->time_to_die)
+		sem_wait(ph->table->sem_write);
+		if (get_time() - ph->last_meal_time >= ph->table->time_to_die)
 		{
-			pthread_mutex_lock(&ph->mutex_eating);
 			message(ph->table, ph->philo_number, "died");
-			ph->table->finish = 0;
-			pthread_mutex_unlock(&ph->mutex_eating);
+			exit(1);
 		}
-		if (ph->table->meal_ammount
-			&& ph->meal_counter >= ph->table->meal_ammount)
-			checking_meal(ph);
+		sem_post(ph->table->sem_write);
 		usleep(100);
 	}
 	return (NULL);
@@ -54,8 +39,8 @@ void	*routine(void *arg)
 	while (ph->table->finish)
 	{
 		take_fork(ph);
-		pthread_mutex_unlock(&ph->table->mutex_forks[ph->philo_left_fork]);
-		pthread_mutex_unlock(&ph->table->mutex_forks[ph->philo_right_fork]);
+		sem_post(ph->table->sem_forks);
+		sem_wait(ph->table->sem_forks);
 		message(ph->table, ph->philo_number, "is sleeping");
 		ft_usleep(ph->table->time_to_sleep);
 		message(ph->table, ph->philo_number, "is thinking");

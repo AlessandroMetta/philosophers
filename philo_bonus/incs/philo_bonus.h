@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_bonus.h                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/10/01 18:47:06 by ametta            #+#    #+#             */
+/*   Updated: 2021/10/01 19:08:01 by ametta           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILO_BONUS_H
 # define PHILO_BONUS_H
 
@@ -6,6 +18,10 @@
 # include <stdlib.h>
 # include <pthread.h>
 # include <sys/time.h>
+# include <semaphore.h>
+# include <signal.h>
+# include <fcntl.h>
+# include <sys/wait.h>
 
 typedef struct s_philo
 {
@@ -13,11 +29,9 @@ typedef struct s_philo
 	pthread_t		monitor_thread;
 	uint64_t		philo_number;
 	uint64_t		last_meal_time;
-	uint64_t		meal_counter;
 	uint64_t		philo_left_fork;
 	uint64_t		philo_right_fork;
-	uint64_t		is_eating;
-	pthread_mutex_t	mutex_eating;
+	sem_t			sem_eating;
 	struct s_args	*table;
 }				t_philo;
 
@@ -29,8 +43,9 @@ typedef struct s_args
 	uint64_t		time_to_sleep;
 	uint64_t		meal_ammount;
 	uint64_t		start_time;
-	pthread_mutex_t	mutex_write;
-	pthread_mutex_t	*mutex_forks;
+	sem_t			sem_write;
+	sem_t			sem_forks;
+	sem_t			sem_eat;
 	uint64_t		finish;
 	t_philo			**philo;
 }				t_args;
