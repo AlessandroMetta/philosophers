@@ -34,8 +34,8 @@ void	*monitor(void *arg)
 			&& get_time() - ph->last_meal_time >= ph->table->time_to_die)
 		{
 			pthread_mutex_lock(&ph->mutex_eating);
-			ph->table->finish = 0;
 			message(ph->table, ph->philo_number, "died");
+			ph->table->finish = 0;
 			pthread_mutex_unlock(&ph->mutex_eating);
 		}
 		if (ph->table->meal_ammount

@@ -12,7 +12,8 @@ int	checking_args_validity(char **argv, int argc)
 	}
 	while (i < argc)
 	{
-		if (argv[i][0] == '-' || ft_str_is_number(argv[i]))
+		if (argv[i][0] == '-' || ft_str_is_number(argv[i])
+			|| ft_atoi(argv[i]) == 0)
 		{
 			printf("Error: wrong argument number\n");
 			return (1);
