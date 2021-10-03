@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 19:07:58 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/01 19:12:36 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/03 14:55:45 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,23 @@ t_philo	**philo_init(t_args *table)
 	return (philo);
 }
 
+int sems_init(t_args *table)
+{
+	sem_unlink("forking");
+	table->sem_forks = sem_open("forking", O_CREAT, 0644, table->philo_ammount);
+	if (table->sem_forks == SEM_FAILED)
+		return (1);
+	sem_unlink("writing");
+	table->sem_write = sem_open("writing", O_CREAT, 0644, 1);
+	if (table->sem_write == SEM_FAILED)
+		return (1);
+	sem_unlink("eatcounter");
+	table->sem_eat = sem_open("eatcounter", O_CREAT, 0644, 1);
+	if (table->sem_eat == SEM_FAILED)
+		return (1);
+	return (0);
+}
+
 t_args	*init(int argc, char **argv)
 {
 	t_args	*table;
@@ -76,18 +93,8 @@ t_args	*init(int argc, char **argv)
 	table->meal_ammount = 0;
 	if (argc == 6)
 		table->meal_ammount = ft_atoi(argv[5]);
-	sem_unlink("forking");
-	table->sem_forks = sem_open("forking", O_CREAT, 0644, table->philo_ammount);
-	if (table->sem_forks == SEM_FAILED)
-		return (NULL);
-	sem_unlink("writing");
-	table->sem_write = sem_open("writing", O_CREAT, 0644, 1);
-	if (table->sem_write == SEM_FAILED)
-		return (NULL);
-	sem_unlink("eatcounter");
-	table->sem_eat = sem_open("eatcounter", O_CREAT, 0644, 1);
-	if (table->sem_eat == SEM_FAILED)
-		return (NULL);
+	if (sems_init(table))
+		return(NULL);
 	table->start_time = get_time();
 	table->philo = philo_init(table);
 	return (table);

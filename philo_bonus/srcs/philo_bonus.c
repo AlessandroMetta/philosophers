@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 19:07:54 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/01 19:12:25 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/03 16:39:55 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,16 +31,13 @@ void	*monitor(void *arg)
 	return (NULL);
 }
 
-void	*routine(void *arg)
+void	*routine(t_philo	*ph)
 {
-	t_philo	*ph;
-
-	ph = ((t_philo *)arg);
-	while (ph->table->finish)
+	while (1)
 	{
 		take_fork(ph);
 		sem_post(ph->table->sem_forks);
-		sem_wait(ph->table->sem_forks);
+		sem_post(ph->table->sem_forks);
 		message(ph->table, ph->philo_number, "is sleeping");
 		ft_usleep(ph->table->time_to_sleep);
 		message(ph->table, ph->philo_number, "is thinking");
@@ -55,20 +52,37 @@ void	start_philo(t_args		*table)
 	i = 0;
 	while (i < table->philo_ammount)
 	{
+		table->philo[i]->philo_pid = fork();
 		table->philo[i]->last_meal_time = get_time();
-		pthread_create(&table->philo[i]->philo_thread, NULL, routine,
+		if (table->philo[i]->philo_pid == 0)
+		{
+			pthread_create(&table->philo[i]->monitor_thread, NULL, monitor,
 			(void *)table->philo[i]);
+			routine(table->philo[i]);
+			exit(1);
+		}
 		i++;
 		usleep(100);
 	}
+}
+
+void	close_processes(t_args *table)
+{
+	uint64_t	i;
+	uint64_t	j;
+	int			status;
+
 	i = 0;
 	while (i < table->philo_ammount)
 	{
-		pthread_create(&table->philo[i]->monitor_thread, NULL, monitor,
-			(void *)table->philo[i]);
-		i++;
-		usleep(100);
+		j = 0;
+		waitpid(-1, &status, 0);
+		if(WIFEXITED(status) || WIFSIGNALED(status))
+			while (j < table->philo_ammount)
+				kill(table->philo[j++]->philo_pid, SIGKILL);
+		i++;	
 	}
+	
 }
 
 int	main(int argc, char **argv)
@@ -78,10 +92,10 @@ int	main(int argc, char **argv)
 	if (checking_args_validity(argv, argc))
 		return (1);
 	table = init(argc, argv);
-	table->finish = 1;
+	if (!table)
+		return (1);
 	table->start_time = get_time();
 	start_philo(table);
-	while (table->finish)
-		continue ;
+	close_processes(table);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 18:47:06 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/01 19:08:01 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/03 16:42:10 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,13 @@
 
 typedef struct s_philo
 {
-	pthread_t		philo_thread;
+	pid_t			philo_pid;
 	pthread_t		monitor_thread;
 	uint64_t		philo_number;
 	uint64_t		last_meal_time;
 	uint64_t		philo_left_fork;
 	uint64_t		philo_right_fork;
-	sem_t			sem_eating;
+	sem_t			*sem_eating;
 	struct s_args	*table;
 }				t_philo;
 
@@ -43,10 +43,9 @@ typedef struct s_args
 	uint64_t		time_to_sleep;
 	uint64_t		meal_ammount;
 	uint64_t		start_time;
-	sem_t			sem_write;
-	sem_t			sem_forks;
-	sem_t			sem_eat;
-	uint64_t		finish;
+	sem_t			*sem_write;
+	sem_t			*sem_forks;
+	sem_t			*sem_eat;
 	t_philo			**philo;
 }				t_args;
 

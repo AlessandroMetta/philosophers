@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 18:58:40 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/01 18:58:41 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/03 15:02:15 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,8 @@ int	main(int argc, char **argv)
 	if (checking_args_validity(argv, argc))
 		return (1);
 	table = init(argc, argv);
+	if (!table)
+		return (1);
 	table->finish = 1;
 	table->start_time = get_time();
 	start_philo(table);
