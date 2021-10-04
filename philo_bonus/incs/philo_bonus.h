@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 18:47:06 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/03 16:42:10 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/04 19:38:12 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ typedef struct s_philo
 	uint64_t		last_meal_time;
 	uint64_t		philo_left_fork;
 	uint64_t		philo_right_fork;
-	sem_t			*sem_eating;
+	uint64_t		meal_counter;
+	sem_t			*sem_eat;
 	struct s_args	*table;
 }				t_philo;
 
@@ -45,7 +46,6 @@ typedef struct s_args
 	uint64_t		start_time;
 	sem_t			*sem_write;
 	sem_t			*sem_forks;
-	sem_t			*sem_eat;
 	t_philo			**philo;
 }				t_args;
 
@@ -59,5 +59,6 @@ void		go_to_bed(t_philo *ph);
 int			ft_str_is_number(char *string);
 int			ft_atoi(const char *str);
 int			checking_args_validity(char **argv, int argc);
+void		close_processes(t_args *table);
 
 #endif

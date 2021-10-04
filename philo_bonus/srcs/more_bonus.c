@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 19:07:58 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/03 14:55:45 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/04 19:40:12 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,32 +49,29 @@ t_philo	**philo_init(t_args *table)
 		philo[i] = (t_philo *)malloc(sizeof(t_philo) * 1);
 		if (!philo[i])
 			return (0);
-		sem_unlink("eating");
-		philo[i]->sem_eating = sem_open("eating", O_CREAT, 0644, 1);
-		if (philo[i]->sem_eating == SEM_FAILED)
-			return (NULL);
 		philo[i]->philo_number = i;
 		philo[i]->table = table;
 		philo[i]->philo_left_fork = i;
 		philo[i]->philo_right_fork = (i + 1) % table->philo_ammount;
+		sem_unlink("eatcounter");
+		philo[i]->sem_eat = sem_open("eatcounter", O_CREAT, 0644, 1);
+		if (philo[i]->sem_eat == SEM_FAILED)
+			return (NULL);
 		i++;
 	}
 	return (philo);
 }
 
-int sems_init(t_args *table)
+int	sems_init(t_args *table)
 {
 	sem_unlink("forking");
-	table->sem_forks = sem_open("forking", O_CREAT, 0644, table->philo_ammount);
+	table->sem_forks = sem_open("forking", O_CREAT, 0644,
+			table->philo_ammount);
 	if (table->sem_forks == SEM_FAILED)
 		return (1);
 	sem_unlink("writing");
 	table->sem_write = sem_open("writing", O_CREAT, 0644, 1);
 	if (table->sem_write == SEM_FAILED)
-		return (1);
-	sem_unlink("eatcounter");
-	table->sem_eat = sem_open("eatcounter", O_CREAT, 0644, 1);
-	if (table->sem_eat == SEM_FAILED)
 		return (1);
 	return (0);
 }
@@ -94,7 +91,7 @@ t_args	*init(int argc, char **argv)
 	if (argc == 6)
 		table->meal_ammount = ft_atoi(argv[5]);
 	if (sems_init(table))
-		return(NULL);
+		return (NULL);
 	table->start_time = get_time();
 	table->philo = philo_init(table);
 	return (table);
@@ -106,9 +103,10 @@ void	take_fork(t_philo *philo)
 	message(philo->table, philo->philo_number, "has taken the left fork");
 	sem_wait(philo->table->sem_forks);
 	message(philo->table, philo->philo_number, "has taken the right fork");
-	sem_wait(philo->sem_eating);
-	philo->last_meal_time = get_time();
 	message(philo->table, philo->philo_number, "is eating");
+	philo->meal_counter++;
+	sem_wait(philo->sem_eat);
+	philo->last_meal_time = get_time();
 	ft_usleep(philo->table->time_to_eat);
-	sem_post(philo->sem_eating);
+	sem_post(philo->sem_eat);
 }

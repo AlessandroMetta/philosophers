@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 19:08:07 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/01 19:08:07 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/04 13:00:18 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,4 +51,24 @@ int	ft_str_is_number(char *string)
 		i++;
 	}
 	return (0);
+}
+
+void	close_processes(t_args *table)
+{
+	uint64_t	i;
+	uint64_t	j;
+	int			status;
+
+	i = 0;
+	while (i < table->philo_ammount)
+	{
+		j = 0;
+		waitpid(-1, &status, 0);
+		if (WIFEXITED(status) || WIFSIGNALED(status))
+		{
+			while (j < table->philo_ammount)
+				kill(table->philo[j++]->philo_pid, SIGKILL);
+		}
+		i++;
+	}
 }
