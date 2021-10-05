@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 19:07:58 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/04 19:40:12 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/05 11:20:30 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,6 @@ t_philo	**philo_init(t_args *table)
 			return (0);
 		philo[i]->philo_number = i;
 		philo[i]->table = table;
-		philo[i]->philo_left_fork = i;
-		philo[i]->philo_right_fork = (i + 1) % table->philo_ammount;
 		sem_unlink("eatcounter");
 		philo[i]->sem_eat = sem_open("eatcounter", O_CREAT, 0644, 1);
 		if (philo[i]->sem_eat == SEM_FAILED)
@@ -72,6 +70,10 @@ int	sems_init(t_args *table)
 	sem_unlink("writing");
 	table->sem_write = sem_open("writing", O_CREAT, 0644, 1);
 	if (table->sem_write == SEM_FAILED)
+		return (1);
+	sem_unlink("meal");
+	table->sem_meal = sem_open("meal", O_CREAT, 0644, 1);
+	if (table->sem_meal == SEM_FAILED)
 		return (1);
 	return (0);
 }
@@ -104,8 +106,8 @@ void	take_fork(t_philo *philo)
 	sem_wait(philo->table->sem_forks);
 	message(philo->table, philo->philo_number, "has taken the right fork");
 	message(philo->table, philo->philo_number, "is eating");
-	philo->meal_counter++;
 	sem_wait(philo->sem_eat);
+	sem_post(philo->table->sem_meal);
 	philo->last_meal_time = get_time();
 	ft_usleep(philo->table->time_to_eat);
 	sem_post(philo->sem_eat);

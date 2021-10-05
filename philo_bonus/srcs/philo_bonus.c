@@ -6,34 +6,38 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 19:07:54 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/04 19:59:39 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/05 11:25:44 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/philo_bonus.h"
 
-void	checking_meal(t_philo	*ph)
+void	*monitor_meal(void *args)
 {
+	t_args		*table;
+	uint64_t	eat_counter;
 	uint64_t	i;
 
-	i = 0;
-	while (i < ph->table->philo_ammount)
+	table = (t_args *)args;
+	eat_counter = 0;
+	while (eat_counter < table->meal_ammount)
 	{
-		if (ph->table->philo[i]->meal_counter < ph->table->meal_ammount)
-			return ;
-		if (i == ph->table->philo_ammount - 1)
+		i = 0;
+		while (i <= table->philo_ammount)
 		{
-			sem_wait(ph->table->sem_write);
-			exit(1);
+			sem_wait(table->sem_meal);
+			i++;
 		}
-		sem_wait(ph->table->sem_write);
-		printf("\t\t%llu\n", i);
-		sem_post(ph->table->sem_write);
-		i++;
+		eat_counter++;
 	}
+	sem_wait(table->sem_write);
+  	i = 0;
+	while (i < table->philo_ammount)
+		kill(table->philo[i++]->philo_pid, SIGKILL);
+	return (NULL);
 }
 
-void	*monitor(void *arg)
+void	*monitor_die(void *arg)
 {
 	t_philo	*ph;
 
@@ -46,9 +50,6 @@ void	*monitor(void *arg)
 			message(ph->table, ph->philo_number, "died");
 			exit(1);
 		}
-		if (ph->table->meal_ammount
-			&& ph->meal_counter >= ph->table->meal_ammount)
-			checking_meal(ph);
 		sem_post(ph->sem_eat);
 		usleep(100);
 	}
@@ -75,13 +76,16 @@ void	start_philo(t_args		*table)
 	uint64_t	i;
 
 	i = 0;
+	if (table->meal_ammount)
+		pthread_create(&table->monitor_meal, NULL, monitor_meal,
+			(void *)table);
 	while (i < table->philo_ammount)
 	{
 		table->philo[i]->philo_pid = fork();
 		table->philo[i]->last_meal_time = get_time();
 		if (table->philo[i]->philo_pid == 0)
 		{
-			pthread_create(&table->philo[i]->monitor_thread, NULL, monitor,
+			pthread_create(&table->philo[i]->monitor_die, NULL, monitor_die,
 				(void *)table->philo[i]);
 			routine(table->philo[i]);
 			exit(1);
