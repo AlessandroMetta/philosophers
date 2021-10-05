@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 19:07:56 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/01 19:07:56 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/05 12:01:06 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	ft_check(unsigned long pt, int s)
 	if (pt > INT64_MAX && s == -1)
 		return (0);
 	else if (pt > INT32_MAX)
-		return (1);
+		return (-1);
 	return (pt * s);
 }
 

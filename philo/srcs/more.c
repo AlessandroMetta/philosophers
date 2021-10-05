@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 18:58:45 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/01 18:58:45 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/05 11:59:34 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	checking_args_validity(char **argv, int argc)
 		if (argv[i][0] == '-' || ft_str_is_number(argv[i])
 			|| ft_atoi(argv[i]) == 0)
 		{
-			printf("Error: wrong argument number\n");
+			printf("Error: Invalid Arguments\n");
 			return (1);
 		}
 		i++;
@@ -48,7 +48,7 @@ t_philo	**philo_init(t_args *table)
 	{
 		philo[i] = (t_philo *)malloc(sizeof(t_philo) * 1);
 		if (!philo[i])
-			return (0);
+			return (NULL);
 		if (pthread_mutex_init(&philo[i]->mutex_eating, NULL))
 			return (NULL);
 		philo[i]->philo_number = i;
@@ -65,9 +65,16 @@ t_philo	**philo_init(t_args *table)
 pthread_mutex_t	*fork_init(t_args	*table)
 {
 	pthread_mutex_t	*mutex_forks;
-	uint64_t		i;
+	int				i;
 
 	i = 0;
+	if (table->philo_ammount == -1 || table->time_to_die == -1 
+		|| table->time_to_eat == -1  || table->time_to_sleep == -1 
+		|| table->meal_ammount == -1 )
+	{
+		printf("Error: Invalid Arguments\n");
+		return (NULL);
+	}
 	mutex_forks = malloc(sizeof(pthread_mutex_t) * table->philo_ammount);
 	if (!mutex_forks)
 		return (NULL);
@@ -97,6 +104,8 @@ t_args	*init(int argc, char **argv)
 	table->start_time = get_time();
 	table->mutex_forks = fork_init(table);
 	table->philo = philo_init(table);
+	if (!table->philo || !table->mutex_forks)
+		return (NULL);
 	return (table);
 }
 

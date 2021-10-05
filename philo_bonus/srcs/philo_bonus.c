@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 19:07:54 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/05 11:25:44 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/05 12:03:59 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 void	*monitor_meal(void *args)
 {
-	t_args		*table;
-	uint64_t	eat_counter;
-	uint64_t	i;
+	t_args	*table;
+	int		eat_counter;
+	int		i;
 
 	table = (t_args *)args;
 	eat_counter = 0;
@@ -31,7 +31,7 @@ void	*monitor_meal(void *args)
 		eat_counter++;
 	}
 	sem_wait(table->sem_write);
-  	i = 0;
+	i = 0;
 	while (i < table->philo_ammount)
 		kill(table->philo[i++]->philo_pid, SIGKILL);
 	return (NULL);
@@ -71,9 +71,9 @@ void	*routine(t_philo	*ph)
 	return (NULL);
 }
 
-void	start_philo(t_args		*table)
+void	start_philo(t_args	*table)
 {
-	uint64_t	i;
+	int	i;
 
 	i = 0;
 	if (table->meal_ammount)

@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 18:58:40 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/05 11:06:34 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/05 11:52:32 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	checking_meal(t_philo	*ph)
 {
-	uint64_t	i;
+	int	i;
 
 	i = 0;
 	pthread_mutex_lock(&ph->mutex_eating);
@@ -75,9 +75,9 @@ void	*routine(void *arg)
 	return (NULL);
 }
 
-void	start_philo(t_args		*table)
+void	start_philo(t_args *table)
 {
-	uint64_t	i;
+	int	i;
 
 	i = 0;
 	while (i < table->philo_ammount)

@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 18:47:06 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/05 11:20:08 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/05 12:05:33 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ typedef struct s_philo
 {
 	pid_t			philo_pid;
 	pthread_t		monitor_die;
-	uint64_t		philo_number;
-	uint64_t		last_meal_time;
+	int				philo_number;
+	int				last_meal_time;
 	sem_t			*sem_eat;
 	struct s_args	*table;
 }				t_philo;
@@ -36,20 +36,20 @@ typedef struct s_philo
 typedef struct s_args
 {
 	pthread_t		monitor_meal;
-	uint64_t		philo_ammount;
-	uint64_t		time_to_die;
-	uint64_t		time_to_eat;
-	uint64_t		time_to_sleep;
-	uint64_t		meal_ammount;
-	uint64_t		start_time;
+	int				philo_ammount;
+	int				time_to_die;
+	int				time_to_eat;
+	int				time_to_sleep;
+	int				meal_ammount;
+	int				start_time;
 	sem_t			*sem_write;
 	sem_t			*sem_meal;
 	sem_t			*sem_forks;
 	t_philo			**philo;
 }				t_args;
 
-uint64_t	get_time(void);
-void		message(t_args *table, uint64_t philo_number, char *msg);
+int			get_time(void);
+void		message(t_args *table, int philo_number, char *msg);
 void		ft_usleep(uint64_t time_in_ms);
 t_args		*init(int argc, char **argv);
 void		take_fork(t_philo *ph);

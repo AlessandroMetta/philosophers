@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 19:07:58 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/05 11:20:30 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/05 12:03:10 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	checking_args_validity(char **argv, int argc)
 		if (argv[i][0] == '-' || ft_str_is_number(argv[i])
 			|| ft_atoi(argv[i]) == 0)
 		{
-			printf("Error: wrong argument number\n");
+			printf("Error: Invalid Arguments\n");
 			return (1);
 		}
 		i++;
@@ -89,6 +89,13 @@ t_args	*init(int argc, char **argv)
 	table->time_to_die = (uint64_t)ft_atoi(argv[2]);
 	table->time_to_eat = (uint64_t)ft_atoi(argv[3]);
 	table->time_to_sleep = (uint64_t)ft_atoi(argv[4]);
+	if (table->philo_ammount == -1 || table->time_to_die == -1
+		|| table->time_to_eat == -1 || table->time_to_sleep == -1
+		|| table->meal_ammount == -1)
+	{
+		printf("Error: Invalid Arguments\n");
+		return (NULL);
+	}
 	table->meal_ammount = 0;
 	if (argc == 6)
 		table->meal_ammount = ft_atoi(argv[5]);

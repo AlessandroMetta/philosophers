@@ -6,13 +6,13 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 19:08:07 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/05 09:56:21 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/05 12:05:54 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/philo_bonus.h"
 
-uint64_t	get_time(void)
+int	get_time(void)
 {
 	static struct timeval	tv;
 
@@ -20,10 +20,10 @@ uint64_t	get_time(void)
 	return ((tv.tv_sec * (uint64_t)1000) + (tv.tv_usec / 1000));
 }
 
-void	message(t_args *table, uint64_t philo_number, char *msg)
+void	message(t_args *table, int philo_number, char *msg)
 {
 	sem_wait(table->sem_write);
-	printf("[%llu]\tPhilosopher %llu %s\n", get_time() - table->start_time,
+	printf("[%d]\tPhilosopher %d %s\n", get_time() - table->start_time,
 		philo_number + 1, msg);
 	if (msg[0] != 'd')
 		sem_post(table->sem_write);
@@ -55,8 +55,8 @@ int	ft_str_is_number(char *string)
 
 void	close_processes(t_args *table)
 {
-	uint64_t	i;
-	int			status;
+	int	i;
+	int	status;
 
 	i = 0;
 	waitpid(-1, &status, 0);
