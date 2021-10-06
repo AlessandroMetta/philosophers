@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 18:46:41 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/05 12:06:30 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/06 15:29:34 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ typedef struct s_args
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				meal_ammount;
-	int		start_time;
+	int				start_time;
 	pthread_mutex_t	mutex_write;
 	pthread_mutex_t	*mutex_forks;
 	int				finish;

@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 18:46:49 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/05 12:00:48 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/06 15:29:55 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ int	ft_isdigit(char c)
 
 int	ft_check(unsigned long pt, int s)
 {
-
 	if (pt > INT64_MAX && s == -1)
 		return (0);
 	else if (pt > INT32_MAX)

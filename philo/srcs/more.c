@@ -6,7 +6,7 @@
 /*   By: ametta <ametta@student.42roma.it>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 18:58:45 by ametta            #+#    #+#             */
-/*   Updated: 2021/10/05 11:59:34 by ametta           ###   ########.fr       */
+/*   Updated: 2021/10/06 15:30:29 by ametta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,8 @@ pthread_mutex_t	*fork_init(t_args	*table)
 	int				i;
 
 	i = 0;
-	if (table->philo_ammount == -1 || table->time_to_die == -1 
-		|| table->time_to_eat == -1  || table->time_to_sleep == -1 
+	if (table->philo_ammount == -1 || table->time_to_die == -1
+		|| table->time_to_eat == -1 || table->time_to_sleep == -1
 		|| table->meal_ammount == -1 )
 	{
 		printf("Error: Invalid Arguments\n");
