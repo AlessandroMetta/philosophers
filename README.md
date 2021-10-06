@@ -59,17 +59,17 @@ int	get_time(void)
 Use sometimes ` leaks -atExit -- ` for checking memory leaks
 | test | expected output |
 |----------|-------|
-| ./philo 1 200 200 200 | philo 1 must take a fork and die in 210 ms |
-| ./philo 2 800 200 200 | nobody must die |
-| ./philo 5 800 200 200 | nobody must die |
-| ./philo 5 800 200 200 7 | the simulation must stop when every philo eat at least 7 times |
-| ./philo 5 500 200 200 7 | a philo must die before stopping the simulation |
-| ./philo 4 410 200 200 | nobody must die |
-| ./philo 4 310 200 200 | one philo must die |
-| ./philo 4 500 200 1.2 | invalid argument |
-| ./philo 4 0 200 200 | invalid argument |
-| ./philo 4 -500 200 200 | invalid argument |
-| ./philo 4 500 200 2147483647 | a philo must die in 510 ms |
-| ./philo 4 2147483647 200 200 | nobody must die |
-| ./philo 4 214748364732 200 200 | invalid argument|
-| ./philo 4 200 210 200 | one philo must die, the message must be printed in 210 ms |
+| 1 200 200 200 | philo 1 must take a fork and die in 210 ms |
+| 2 800 200 200 | nobody must die |
+| 5 800 200 200 | nobody must die |
+| 5 800 200 200 7 | the simulation must stop when every philo eat at least 7 times |
+| 5 500 200 200 7 | a philo must die before stopping the simulation |
+| 4 410 200 200 | nobody must die |
+| 4 310 200 200 | one philo must die |
+| 4 500 200 1.2 | invalid argument |
+| 4 0 200 200 | invalid argument |
+| 4 -500 200 200 | invalid argument |
+| 4 500 200 2147483647 | a philo must die in 510 ms |
+| 4 2147483647 200 200 | nobody must die |
+| 4 214748364732 200 200 | invalid argument|
+| 4 200 210 200 | one philo must die, the message must be printed in 210 ms |
