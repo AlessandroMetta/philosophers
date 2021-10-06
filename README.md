@@ -6,8 +6,8 @@
 
 If you like me never heard about the Dining Philosophers, I suggest to read the [relative Wikipedia page](https://en.wikipedia.org/wiki/Dining_philosophers_problem).
 <p align="justify">
-The difference between the problem and the subject is the time limit: the philosophers can't stay too much without eating, the eating action need a while to be done, like also sleeping. All these variables are set runtime, and has to be parsed and checked.
-Every philo (in the mandatory part) has to be a thread. The thread is a part of code execute in parallel. This thing is very useful as it allows us to take full advantage of the multithreaded technology of current processors.
+The difference between the problem and the subject is the implementation of the time limit: philosophers can't stay too much without eating, the eating need a while to be done, like also sleeping. All these variables are set runtime, and has to be parsed and checked.
+Every philo (in the mandatory part) has to be a thread. The thread is a part of code execute in parallel, so that mean that we can execute code in the same time. This thing is very interesting as it allows us to take full advantage of the multithreaded technology of current processors.
 </p>
 
 [Short introduction to thread](https://code-vault.net/course/6q6s9eerd0:1609007479575/lesson/18ec1942c2da46840693efe9b51d86a8)
@@ -16,11 +16,42 @@ Every philo (in the mandatory part) has to be a thread. The thread is a part of 
   <img width="400" src="Immagine.png">
 </p>
 <p align="justify">
-With this concept, is important to understand that using variable share between more thread can be dangerous: the parallel execution is not actual, but execute one per time. This implies that the share variables could be modify impropely, causing errors, so is important to prioritize them. This means that when a variable is used by a thread, has to be lock, so no others can use them. Mutexes are used for this purpose.
+But it doesn't mean that is simple: sharing variables between threads can be dangerous, since parallel execution is not actual, but the threads are executing one per time. This implies that the share variables could be modify impropely, causing errors, so is important to prioritize them. This means that when a variable is used by a thread, has to be lock, so no others can use them. Mutexes are used for this purpose.
 </p>
 
 [example of problems with share variable](https://code-vault.net/course/6q6s9eerd0:1609007479575/lesson/18ec1942c2da46840693efe9b51ea1a2)   
 [using mutexes](https://code-vault.net/course/6q6s9eerd0:1609007479575/lesson/18ec1942c2da46840693efe9b51eabf6)
+
+## Bonus Part
+
+<p align="justify">
+In the bonus part, the philosophers are supposed to be created like processes: this mean that they are not part of the same program, so mutexes are unuseful. Fo this comes the semaphores, a mutex like variable that gives us the possibilities to prioritize the use of variables. 
+</p>
+
+## Some advices
+- you have to know that `exit()` is forbidden in the Mandatory Part;
+- the `usleep()` is deprecate by The Manual, so you have to implement a "checker" to make it works as we want.
+```
+void	ft_usleep(long int time_in_ms)
+{
+	long int	start_time;
+
+	start_time = 0;
+	start_time = actual_time();
+	while ((actual_time() - start_time) < time_in_ms)
+		usleep(time_in_ms / 10);
+}
+```
+- also the `gettimeoftheday()` has to be implemented for give us the millisecond result
+```
+int	get_time(void)
+{
+	static struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return ((tv.tv_sec * (uint64_t)1000) + (tv.tv_usec / 1000));
+}
+```
 
 ## Test cases
 Use sometimes ` leaks -atExit -- ` for checking memory leaks
