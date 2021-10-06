@@ -19,14 +19,16 @@ Every philo (in the mandatory part) has to be a thread. The thread is a part of 
 But it doesn't mean that is simple: sharing variables between threads can be dangerous, since parallel execution is not actual, but the threads are executing one per time. This implies that the share variables could be modify impropely, causing errors, so is important to prioritize them. This means that when a variable is used by a thread, has to be lock, so no others can use them. Mutexes are used for this purpose.
 </p>
 
-[example of problems with share variable](https://code-vault.net/course/6q6s9eerd0:1609007479575/lesson/18ec1942c2da46840693efe9b51ea1a2)   
-[using mutexes](https://code-vault.net/course/6q6s9eerd0:1609007479575/lesson/18ec1942c2da46840693efe9b51eabf6)
+[Problems with Sharing Variables to Multiple Threads](https://code-vault.net/course/6q6s9eerd0:1609007479575/lesson/18ec1942c2da46840693efe9b51ea1a2)   
+[Using Mutexes](https://code-vault.net/course/6q6s9eerd0:1609007479575/lesson/18ec1942c2da46840693efe9b51eabf6)
 
 ## Bonus Part
 
 <p align="justify">
 In the bonus part, the philosophers are supposed to be created like processes: this mean that they are not part of the same program, so mutexes are unuseful. Fo this comes the semaphores, a mutex like variable that gives us the possibilities to prioritize the use of variables. 
 </p>
+
+[Introduction to Semaphores](https://code-vault.net/course/6q6s9eerd0:1609007479575/lesson/v9l3sqtpft:1609091934815)
 
 ## Some advices
 - you have to know that `exit()` is forbidden in the Mandatory Part;
