@@ -5,6 +5,8 @@
 </p>
 
 If you like me never heard about the Dining Philosophers, I suggest to read the [relative Wikipedia page](https://en.wikipedia.org/wiki/Dining_philosophers_problem).
+
+## Mandatory Part
 <p align="justify">
 The difference between the problem and the subject is the implementation of the time limit: philosophers can't stay too much without eating, the eating need a while to be done, like also sleeping. All these variables are set runtime, and has to be parsed and checked.
 Every philo (in the mandatory part) has to be a thread. The thread is a part of code execute in parallel, so that mean that we can execute code in the same time. This thing is very interesting as it allows us to take full advantage of the multithreaded technology of current processors.
