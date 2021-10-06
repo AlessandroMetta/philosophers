@@ -28,12 +28,13 @@ With this concept, is important to understand that using variable share between 
 | ./philo 2 800 200 200 | nobody must die |
 | ./philo 5 800 200 200 | nobody must die |
 | ./philo 5 800 200 200 7 | the simulation must stop when every philo eat at least 7 times |
+| ./philo 5 500 200 200 7 | a philo must die before stopping the simulation |
 | ./philo 4 410 200 200 | nobody must die |
 | ./philo 4 310 200 200 | one philo must die |
 | ./philo 4 500 200 1.2 | invalid argument |
 | ./philo 4 0 200 200 | invalid argument |
 | ./philo 4 -500 200 200 | invalid argument |
-| ./philo 4 500 200 2147483647 | a philo must die after 500 ms |
+| ./philo 4 500 200 2147483647 | a philo must die in 510 ms |
 | ./philo 4 2147483647 200 200 | nobody must die |
 | ./philo 4 214748364732 200 200 | invalid argument|
-| ./philo 4 200 210 200 | one philo must die, the message must be printed before 210 ms |
+| ./philo 4 200 210 200 | one philo must die, the message must be printed in 210 ms |
