@@ -22,6 +22,7 @@ With this concept, is important to understand that using variable share between 
 [example of problems with share variable](https://code-vault.net/course/6q6s9eerd0:1609007479575/lesson/18ec1942c2da46840693efe9b51ea1a2)   
 [using mutexes](https://code-vault.net/course/6q6s9eerd0:1609007479575/lesson/18ec1942c2da46840693efe9b51eabf6)
 
+## Tests
 | test | expected output |
 |----------|-------|
 | ./philo 1 200 200 200 | philo 1 must take a fork and die in 210 ms |
